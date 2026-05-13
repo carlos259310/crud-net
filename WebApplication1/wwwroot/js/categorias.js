@@ -1,194 +1,79 @@
-﻿const productosUrl = "http://localhost:5117/api/productos";
-const categoriasUrl = "http://localhost:5117/api/categorias";
+﻿document.addEventListener("DOMContentLoaded", () => {
 
-const form = document.getElementById("productoForm");
+    const categoriasUrl = "http://localhost:5117/api/categorias";
 
-const productoId = document.getElementById("productoId");
+    const form = document.getElementById("categoriaForm");
+    const categoriaId = document.getElementById("categoriaId");
+    const nombre = document.getElementById("nombre");
+    const table = document.getElementById("categoriasTable");
 
-const nombre = document.getElementById("nombre");
+    async function loadCategorias() {
+        const response = await fetch(categoriasUrl);
+        const categorias = await response.json();
 
-const descripcion = document.getElementById("descripcion");
+        table.innerHTML = "";
 
-const precio = document.getElementById("precio");
+        categorias.forEach(categoria => {
+            table.innerHTML += `
+                <tr>
+                    <td>${categoria.id}</td>
+                    <td>${categoria.nombre}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm"
+                            onclick='editCategoria(${JSON.stringify(categoria)})'>
+                            Editar
+                        </button>
 
-const stock = document.getElementById("stock");
+                        <button class="btn btn-danger btn-sm"
+                            onclick="deleteCategoria(${categoria.id})">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
 
-const categoriaId = document.getElementById("categoriaId");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-const activo = document.getElementById("activo");
+        const categoria = {
+            nombre: nombre.value
+        };
 
-const table = document.getElementById("productosTable");
+        const id = categoriaId.value;
 
+        if (id) {
+            await fetch(`${categoriasUrl}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(categoria)
+            });
+        } else {
+            await fetch(categoriasUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(categoria)
+            });
+        }
 
-// ===============================
-// CARGAR CATEGORIAS
-// ===============================
-async function loadCategorias() {
-
-    const response = await fetch(categoriasUrl);
-
-    const categorias = await response.json();
-
-    categoriaId.innerHTML = `
-        <option value="">Seleccione</option>
-    `;
-
-    categorias.forEach(categoria => {
-
-        categoriaId.innerHTML += `
-            <option value="${categoria.id}">
-                ${categoria.nombre}
-            </option>
-        `;
+        form.reset();
+        categoriaId.value = "";
+        loadCategorias();
     });
-}
 
-
-// ===============================
-// CARGAR PRODUCTOS
-// ===============================
-async function loadProductos() {
-
-    const response = await fetch(productosUrl);
-
-    const productos = await response.json();
-
-    const categoriasResponse = await fetch(categoriasUrl);
-
-    const categorias = await categoriasResponse.json();
-
-    table.innerHTML = "";
-
-    productos.forEach(producto => {
-
-        const categoria = categorias.find(
-            x => x.id === producto.categoriaId
-        );
-
-        table.innerHTML += `
-            <tr>
-                <td>${producto.id}</td>
-                <td>${producto.nombre}</td>
-                <td>$ ${producto.precio}</td>
-                <td>${producto.stock}</td>
-                <td>${categoria?.nombre ?? ""}</td>
-                <td>
-                    ${producto.activo ? "Sí" : "No"}
-                </td>
-
-                <td>
-
-                    <button class="btn btn-warning btn-sm"
-                        onclick='editProducto(${JSON.stringify(producto)})'>
-                        Editar
-                    </button>
-
-                    <button class="btn btn-danger btn-sm"
-                        onclick="deleteProducto(${producto.id})">
-                        Eliminar
-                    </button>
-
-                </td>
-            </tr>
-        `;
-    });
-}
-
-
-// ===============================
-// GUARDAR
-// ===============================
-form.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    const producto = {
-        nombre: nombre.value,
-        descripcion: descripcion.value,
-        precio: parseFloat(precio.value),
-        stock: parseInt(stock.value),
-        categoriaId: parseInt(categoriaId.value),
-        activo: activo.checked
+    window.editCategoria = function (categoria) {
+        categoriaId.value = categoria.id;
+        nombre.value = categoria.nombre;
     };
 
-    const id = productoId.value;
+    window.deleteCategoria = async function (id) {
+        const confirmar = confirm("¿Desea eliminar la categoría?");
+        if (!confirmar) return;
 
-    // EDITAR
-    if (id) {
+        await fetch(`${categoriasUrl}/${id}`, { method: "DELETE" });
+        loadCategorias();
+    };
 
-        await fetch(`${productosUrl}/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(producto)
-        });
-
-    }
-    // CREAR
-    else {
-
-        await fetch(productosUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(producto)
-        });
-    }
-
-    form.reset();
-
-    productoId.value = "";
-
-    loadProductos();
+    loadCategorias();
 });
-
-
-// ===============================
-// EDITAR
-// ===============================
-function editProducto(producto) {
-
-    productoId.value = producto.id;
-
-    nombre.value = producto.nombre;
-
-    descripcion.value = producto.descripcion;
-
-    precio.value = producto.precio;
-
-    stock.value = producto.stock;
-
-    categoriaId.value = producto.categoriaId;
-
-    activo.checked = producto.activo;
-}
-
-
-// ===============================
-// ELIMINAR
-// ===============================
-async function deleteProducto(id) {
-
-    const confirmar = confirm(
-        "¿Desea eliminar el producto?"
-    );
-
-    if (!confirmar)
-        return;
-
-    await fetch(`${productosUrl}/${id}`, {
-        method: "DELETE"
-    });
-
-    loadProductos();
-}
-
-
-// ===============================
-// INICIALIZAR
-// ===============================
-loadCategorias();
-
-loadProductos();
