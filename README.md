@@ -58,18 +58,18 @@ Esto genera un proyecto Web API básico. Puedes borrar los archivos de ejemplo q
 Los paquetes son librerías externas que agregan funcionalidad al proyecto. Necesitamos cuatro:
 
 ```bash
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-dotnet add package Microsoft.EntityFrameworkCore.Tools
-dotnet add package Microsoft.AspNetCore.OpenApi
-dotnet add package Swashbuckle.AspNetCore
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 10.0.7
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 10.0.7
+dotnet add package Microsoft.AspNetCore.OpenApi --version 10.0.7
+dotnet add package Swashbuckle.AspNetCore --version 10.1.7
 ```
 
 **¿Para qué sirve cada uno?**
 
 | Paquete | Por qué lo necesitamos |
 |---|---|
-| `EntityFrameworkCore.SqlServer` | Permite que EF Core se conecte y hable con SQL Server. Sin este paquete EF Core no sabe cómo traducir sus consultas al dialecto de SQL Server. |
-| `EntityFrameworkCore.Tools` | Agrega comandos a la CLI de .NET para trabajar con EF Core (como `dotnet ef`). Necesario aunque no usemos migraciones. |
+| `Microsoft.EntityFrameworkCore.SqlServer` | Permite que EF Core se conecte y hable con SQL Server. Sin este paquete EF Core no sabe cómo traducir sus consultas al dialecto de SQL Server. |
+| `Microsoft.EntityFrameworkCore.Tools` | Agrega comandos a la CLI de .NET para trabajar con EF Core (como `dotnet ef`). Necesario aunque no usemos migraciones. |
 | `Microsoft.AspNetCore.OpenApi` | Genera automáticamente la documentación de los endpoints en formato OpenAPI (el estándar para describir APIs). |
 | `Swashbuckle.AspNetCore` | Lee esa documentación OpenAPI y la convierte en la interfaz web de Swagger, donde puedes probar los endpoints desde el navegador. |
 
@@ -913,6 +913,7 @@ GET http://localhost:5117/api/testdb
 
 | Recurso | URL |
 |---|---|
+| Inicio | `http://localhost:5117/index.html` |
 | Swagger | `http://localhost:5117/swagger` |
 | Frontend — Categorías | `http://localhost:5117/categorias.html` |
 | Frontend — Productos | `http://localhost:5117/productos.html` |
