@@ -23,7 +23,7 @@ cd crud-net
 
 ### 2. Configurar la base de datos
 
-Abre SQL Server Management Studio (SSMS) o cualquier cliente SQL y ejecuta:
+Abre SQL Server Management Studio (SSMS) o cualquier cliente SQL y ejecuta el siguiente script completo:
 
 ```sql
 -- Crear la base de datos
@@ -34,9 +34,29 @@ CREATE LOGIN developer WITH PASSWORD = '123456';
 USE TiendaDB;
 CREATE USER developer FOR LOGIN developer;
 ALTER ROLE db_owner ADD MEMBER developer;
-```
 
-> Las tablas deben existir previamente. Solicita el script de creación al desarrollador si es una instalación nueva.
+-- Crear las tablas
+CREATE TABLE Categorias (
+    Id     INT           IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Productos (
+    Id          INT           IDENTITY(1,1) PRIMARY KEY,
+    Nombre      NVARCHAR(MAX) NOT NULL,
+    Descripcion NVARCHAR(500) NULL,
+    Precio      DECIMAL(18,2) NOT NULL,
+    Stock       INT           NOT NULL,
+    CategoriaId INT           NOT NULL,
+    Activo      BIT           NOT NULL
+);
+
+CREATE TABLE TiposDocumentos (
+    Id     INT          IDENTITY(1,1) PRIMARY KEY,
+    Codigo NVARCHAR(10) NOT NULL,
+    Nombre NVARCHAR(50) NOT NULL
+);
+```
 
 ### 3. Verificar la cadena de conexión
 
@@ -114,4 +134,4 @@ El servidor arranca en `http://localhost:5117`.
 - Luego actualiza la URL en los tres archivos `wwwroot/js/*.js` (están hardcodeadas a `http://localhost:5117`).
 
 **Las tablas no existen en la base de datos**
-- Las tablas deben crearse manualmente. Solicita el script SQL al desarrollador original.
+- Ejecuta el script completo del **Paso 2** (incluye `CREATE TABLE` para `Categorias`, `Productos` y `TiposDocumentos`).
